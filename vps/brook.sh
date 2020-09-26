@@ -772,7 +772,7 @@ exev() {
 	Install_brook
 }
 
-while getopts :l:p:v opt
+while getopts :l:p:v:e opt
 do
   case "$opt" in
   e) exev ;; # 执行入口
