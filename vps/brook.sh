@@ -770,14 +770,19 @@ exev() {
 	bk_passwd=$config_password
 	brook_new_ver="v20200701"  #默认使用v20200701版本，新版本之前试过通信有问题
 	echo "开始执行配置 端口：${config_port} 密码：${config_password} 版本：${brook_new_ver}"
-	Install_brook
+	if([[ -e ${brook_file} ]]) { # 已安装brook
+		Start_brook # start
+	} else {
+		Install_brook # install and start
+	}
 }
 
 
-while getopts :l:p:v:e opt
+while getopts :l:p:v:e:m opt
 do
   case "$opt" in
   e) exev ;; # 执行入口
+  m) Brook_Menu ;; # 菜单
   l) config_port=$OPTARG;; # 端口
   p) config_password=$OPTARG ;; # 密码
   *) echo "Unknown option: $opt" ;;
