@@ -10,8 +10,8 @@ export PATH
 #	Blog: https://doub.io/brook-jc3/
 #=================================================
 
-config_port=""
-config_password=""
+config_port=2333
+config_password="abcdefg"
 
 sh_ver="1.1.13"
 filepath=$(cd "$(dirname "$0")"; pwd)
@@ -217,10 +217,10 @@ Set_passwd(){
 	echo "========================" && echo
 }
 Set_protocol(){
-	echo -e "请选择 Brook 协议
- ${Green_font_prefix}1.${Font_color_suffix} Brook（新版协议，即 [servers]）
- ${Green_font_prefix}2.${Font_color_suffix} Brook Stream（旧版协议，即 [streamservers]，不推荐，除非使用新版协议速度慢）" && echo
-	read -e -p "(默认: 1. Brook（新版协议）):" bk_protocol
+# 	echo -e "请选择 Brook 协议
+#  ${Green_font_prefix}1.${Font_color_suffix} Brook（新版协议，即 [servers]）
+#  ${Green_font_prefix}2.${Font_color_suffix} Brook Stream（旧版协议，即 [streamservers]，不推荐，除非使用新版协议速度慢）" && echo
+	# read -e -p "(默认: 1. Brook（新版协议）):" bk_protocol
 	[[ -z "${bk_protocol}" ]] && bk_protocol="1"
 	if [[ ${bk_protocol} == "1" ]]; then
 		bk_protocol="servers"
@@ -765,10 +765,10 @@ Brook_Menu() {
 }
 
 exev() {
-	echo "开始执行配置 端口：${config_port} 密码：${config_password} 版本：${brook_new_ver}"
 	bk_port=config_port
 	bk_passwd=config_password
 	brook_new_ver="v20200701"  #默认使用v20200701版本，新版本之前试过通信有问题
+	echo "开始执行配置 端口：${config_port} 密码：${config_password} 版本：${brook_new_ver}"
 	Install_brook
 }
 
