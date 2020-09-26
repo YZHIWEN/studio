@@ -765,6 +765,7 @@ Brook_Menu() {
 }
 
 exev() {
+	check_sys
 	bk_port=$config_port
 	bk_passwd=$config_password
 	brook_new_ver="v20200701"  #默认使用v20200701版本，新版本之前试过通信有问题
