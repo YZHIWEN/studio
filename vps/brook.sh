@@ -10,6 +10,9 @@ export PATH
 #	Blog: https://doub.io/brook-jc3/
 #=================================================
 
+config_port=""
+config_password=""
+
 sh_ver="1.1.13"
 filepath=$(cd "$(dirname "$0")"; pwd)
 file_1=$(echo -e "${filepath}"|awk -F "$0" '{print $1}')
@@ -104,8 +107,8 @@ Download_brook(){
 	if [[ ${bit} == "x86_64" ]]; then
 		wget --no-check-certificate -N "https://github.com/txthinking/brook/releases/download/${brook_new_ver}/brook"
 	else
-		wget --no-check-certificate -N "https://github.com/txthinking/brook/releases/download/${brook_new_ver}/brook_linux_386"
-		mv brook_linux_386 brook
+		wget --no-check-certificate -N "https://github.com/txthinking/brook/releases/download/${brook_new_ver}/brook_linux_arm64"
+		mv brook_linux_arm64 brook
 	fi
 	[[ ! -e "brook" ]] && echo -e "${Error} Brook 下载失败 !" && rm -rf "${file}" && exit 1
 	chmod +x brook
@@ -188,10 +191,9 @@ Set_port_Modify(){
 Set_port(){
 	while true
 		do
-		echo -e "请输入 Brook 端口 [1-65535]（端口不能重复，避免冲突）"
-		read -e -p "(默认: 2333):" bk_port
-		[[ -z "${bk_port}" ]] && bk_port="2333"
-		echo $((${bk_port}+0)) &>/dev/null
+		# echo -e "设置端口，默认使用指定2333端口"
+		# [[ -z "${bk_port}" ]] && bk_port="2333"
+		# echo $((${bk_port}+0)) &>/dev/null
 		if [[ $? -eq 0 ]]; then
 			if [[ ${bk_port} -ge 1 ]] && [[ ${bk_port} -le 65535 ]]; then
 				echo && echo "========================"
@@ -207,9 +209,9 @@ Set_port(){
 		done
 }
 Set_passwd(){
-	echo "请输入 Brook 密码（因分享链接特性，密码请勿包含 % 符号）"
-	read -e -p "(默认: doub.io):" bk_passwd
-	[[ -z "${bk_passwd}" ]] && bk_passwd="doub.io"
+	# echo "请输入 Brook 密码（因分享链接特性，密码请勿包含 % 符号）"
+	# read -e -p "(默认: doub.io):" bk_passwd
+	# [[ -z "${bk_passwd}" ]] && bk_passwd="doub.io"
 	echo && echo "========================"
 	echo -e "	密码 : ${Red_background_prefix} ${bk_passwd} ${Font_color_suffix}"
 	echo "========================" && echo
@@ -684,77 +686,98 @@ Update_Shell(){
 	wget -N --no-check-certificate "https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/brook.sh" && chmod +x brook.sh
 	echo -e "脚本已更新为最新版本[ ${sh_new_ver} ] !(注意：因为更新方式为直接覆盖当前运行的脚本，所以可能下面会提示一些报错，无视即可)" && exit 0
 }
-check_sys
-action=$1
-if [[ "${action}" == "monitor" ]]; then
-	crontab_monitor_brook
-else
-	echo && echo -e "  Brook 一键管理脚本 ${Red_font_prefix}[v${sh_ver}]${Font_color_suffix}
-  ---- Toyo | doub.io/brook-jc3 ----
-  
- ${Green_font_prefix} 0.${Font_color_suffix} 升级脚本
-————————————
- ${Green_font_prefix} 1.${Font_color_suffix} 安装 Brook
- ${Green_font_prefix} 2.${Font_color_suffix} 更新 Brook
- ${Green_font_prefix} 3.${Font_color_suffix} 卸载 Brook
-————————————
- ${Green_font_prefix} 4.${Font_color_suffix} 启动 Brook
- ${Green_font_prefix} 5.${Font_color_suffix} 停止 Brook
- ${Green_font_prefix} 6.${Font_color_suffix} 重启 Brook
-————————————
- ${Green_font_prefix} 7.${Font_color_suffix} 设置 账号配置
- ${Green_font_prefix} 8.${Font_color_suffix} 查看 账号信息
- ${Green_font_prefix} 9.${Font_color_suffix} 查看 日志信息
- ${Green_font_prefix}10.${Font_color_suffix} 查看 链接信息
-————————————" && echo
-	if [[ -e ${brook_file} ]]; then
-		check_pid
-		if [[ ! -z "${PID}" ]]; then
-			echo -e " 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} 并 ${Green_font_prefix}已启动${Font_color_suffix}"
-		else
-			echo -e " 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} 但 ${Red_font_prefix}未启动${Font_color_suffix}"
-		fi
+
+Brook_Menu() {
+	check_sys
+	action=$1
+	if [[ "${action}" == "monitor" ]]; then
+		crontab_monitor_brook
 	else
-		echo -e " 当前状态: ${Red_font_prefix}未安装${Font_color_suffix}"
+		echo && echo -e "  Brook 一键管理脚本 ${Red_font_prefix}[v${sh_ver}]${Font_color_suffix}
+	---- Toyo | doub.io/brook-jc3 ----
+	
+	${Green_font_prefix} 0.${Font_color_suffix} 升级脚本
+	————————————
+	${Green_font_prefix} 1.${Font_color_suffix} 安装 Brook
+	${Green_font_prefix} 2.${Font_color_suffix} 更新 Brook
+	${Green_font_prefix} 3.${Font_color_suffix} 卸载 Brook
+	————————————
+	${Green_font_prefix} 4.${Font_color_suffix} 启动 Brook
+	${Green_font_prefix} 5.${Font_color_suffix} 停止 Brook
+	${Green_font_prefix} 6.${Font_color_suffix} 重启 Brook
+	————————————
+	${Green_font_prefix} 7.${Font_color_suffix} 设置 账号配置
+	${Green_font_prefix} 8.${Font_color_suffix} 查看 账号信息
+	${Green_font_prefix} 9.${Font_color_suffix} 查看 日志信息
+	${Green_font_prefix}10.${Font_color_suffix} 查看 链接信息
+	————————————" && echo
+		if [[ -e ${brook_file} ]]; then
+			check_pid
+			if [[ ! -z "${PID}" ]]; then
+				echo -e " 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} 并 ${Green_font_prefix}已启动${Font_color_suffix}"
+			else
+				echo -e " 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} 但 ${Red_font_prefix}未启动${Font_color_suffix}"
+			fi
+		else
+			echo -e " 当前状态: ${Red_font_prefix}未安装${Font_color_suffix}"
+		fi
+		echo
+		read -e -p " 请输入数字 [0-10]:" num
+		case "$num" in
+			0)
+			Update_Shell
+			;;
+			1)
+			Install_brook
+			;;
+			2)
+			Update_brook
+			;;
+			3)
+			Uninstall_brook
+			;;
+			4)
+			Start_brook
+			;;
+			5)
+			Stop_brook
+			;;
+			6)
+			Restart_brook
+			;;
+			7)
+			Set_brook
+			;;
+			8)
+			View_brook
+			;;
+			9)
+			View_Log
+			;;
+			10)
+			View_user_connection_info
+			;;
+			*)
+			echo "请输入正确数字 [0-10]"
+			;;
+		esac
 	fi
-	echo
-	read -e -p " 请输入数字 [0-10]:" num
-	case "$num" in
-		0)
-		Update_Shell
-		;;
-		1)
-		Install_brook
-		;;
-		2)
-		Update_brook
-		;;
-		3)
-		Uninstall_brook
-		;;
-		4)
-		Start_brook
-		;;
-		5)
-		Stop_brook
-		;;
-		6)
-		Restart_brook
-		;;
-		7)
-		Set_brook
-		;;
-		8)
-		View_brook
-		;;
-		9)
-		View_Log
-		;;
-		10)
-		View_user_connection_info
-		;;
-		*)
-		echo "请输入正确数字 [0-10]"
-		;;
-	esac
-fi
+}
+
+exev() {
+	echo "开始执行配置 端口：${config_port} 密码：${config_password} 版本：${brook_new_ver}"
+	bk_port=config_port
+	bk_passwd=config_password
+	brook_new_ver="v20200701"  #默认使用v20200701版本，新版本之前试过通信有问题
+	Install_brook
+}
+
+while getopts :l:p:v opt
+do
+  case "$opt" in
+  e) exev ;; # 执行入口
+  l) config_port=$OPTARG;; # 端口
+  p) config_password=$OPTARG ;; # 密码
+  *) echo "Unknown option: $opt" ;;
+  esac
+done
